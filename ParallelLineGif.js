@@ -12,7 +12,7 @@ const lines = 2
 const nodes = 5
 
 const maxScale = (scale, i, n) => Math.max(0, scale - i / n)
-const divideScale = (scale, i, n) => Math.min(1/n, scale - i / n) * n
+const divideScale = (scale, i, n) => Math.min(1/n, maxScale(scale, i, n)) * n
 const scaleFactor = (scale) => Math.floor(scale / 0.51)
 const mirrorValue = (scale, a, b) => {
     const k = scaleFactor(scale)
@@ -46,8 +46,7 @@ const drawPLNode = (context, i, scale) => {
         const sc1j = divideScale(sc1, j, lines)
         const sc2j = divideScale(sc2, j, lines)
         context.save()
-        context.scale(1 - 2 * j, 1)
-        drawRotatedLine(context, size, h/2 * sc2j, (Math.PI/2) * sc1j)
+        drawRotatedLine(context, size * (1 - 2 * j), h/2 * (1 - 2 * j) * sc2j, (Math.PI/2) * sc1j)
         context.restore()
     }
     context.restore()
@@ -99,6 +98,7 @@ class PLNode {
     }
 
     update(cb) {
+        console.log(`${this.i} is updating`)
         this.state.update(cb)
     }
 
@@ -132,6 +132,7 @@ class ParallelLine {
 
     update(cb) {
         this.curr.update(() => {
+            console.log(`${this.curr.i} has stopped updating`)
             this.curr = this.curr.getNext(this.dir, () => {
                 this.dir *= -1
             })
@@ -152,6 +153,8 @@ class Renderer {
 
     render(context, cb, endcb) {
         while (this.running) {
+            context.fillStyle = backColor
+            context.fillRect(0, 0, w, h) 
             this.pl.draw(context)
             cb(context)
             this.pl.update(() => {
