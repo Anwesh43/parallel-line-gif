@@ -163,11 +163,10 @@ class Renderer {
 }
 
 class ParallelLineGif {
-    constructor(fn) {
+    constructor() {
         this.encoder = new GifEncoder(w, h)
         this.renderer = new Renderer()
         this.canvas = new Canvas(w, h)
-        this.initEncoder(fn)
     }
 
     initEncoder(fn) {
@@ -178,12 +177,20 @@ class ParallelLineGif {
         this.encoder.createReadStream().pipe(require('fs').createWriteStream(fn))
     }
 
-    render(context) {
+    render() {
         this.encoder.start()
-        this.renderer.render(context, (context) => {
+        this.renderer.render(this.context, (context) => {
             this.encoder.addFrame(context)
         }, () => {
             this.encoder.end()
         })
     }
+
+    static create(fn) {
+        const gif = new ParallelLineGif()
+        gif.initEncoder(fn)
+        gif.render()
+    }
 }
+
+module.exports = ParallelLineGif
