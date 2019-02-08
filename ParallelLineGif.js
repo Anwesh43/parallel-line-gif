@@ -161,3 +161,29 @@ class Renderer {
         }
     }
 }
+
+class ParallelLineGif {
+    constructor(fn) {
+        this.encoder = new GifEncoder(w, h)
+        this.renderer = new Renderer()
+        this.canvas = new Canvas(w, h)
+        this.initEncoder(fn)
+    }
+
+    initEncoder(fn) {
+        this.context = this.canvas.getContext('2d')
+        this.encoder.setRepeat(0)
+        this.encoder.setDelay(50)
+        this.encoder.setQuality(100)
+        this.encoder.createReadStream().pipe(require('fs').createWriteStream(fn))
+    }
+
+    render(context) {
+        this.encoder.start()
+        this.renderer.render(context, (context) => {
+            this.encoder.addFrame(context)
+        }, () => {
+            this.encoder.end()
+        })
+    }
+}
