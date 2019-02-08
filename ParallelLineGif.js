@@ -70,10 +70,51 @@ class State {
         }
     }
 
-    startUpdating(cb) {
+    startUpdating() {
         if (this.dir == 0) {
             this.dir = 1 - 2 * this.prevScale
-            cb()
         }
+    }
+}
+
+class PLNode {
+    constructor(i) {
+        this.i = i
+        this.state = new State()
+        this.addNeighbor()
+    }
+
+    addNeighbor() {
+        if (this.i < nodes - 1) {
+            this.next = new PLNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    draw(context) {
+        drawPLNode(context, this.i, this.state.scale)
+        if (this.next) {
+            this.next.draw(context)
+        }
+    }
+
+    update(cb) {
+        this.state.update(cb)
+    }
+
+    startUpdating() {
+        this.state.startUpdating()
+    }
+
+    getNext(dir, cb) {
+        var curr = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr != null) {
+            return curr
+        }
+        cb()
+        return this
     }
 }
