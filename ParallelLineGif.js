@@ -118,3 +118,28 @@ class PLNode {
         return this
     }
 }
+
+class ParallelLine {
+    constructor() {
+        this.curr = new PLNode(0)
+        this.dir = 1
+        this.curr.startUpdating()
+    }
+
+    draw(context) {
+        this.curr.draw(context)
+    }
+
+    update(cb) {
+        this.curr.update(() => {
+            this.curr = this.curr.getNext(this.dir, () => {
+                this.dir *= -1
+            })
+            if (this.dir == 1 && this.curr.i == 0) {
+                cb()
+            } else {
+                this.curr.startUpdating()
+            }
+        })
+    }
+}
