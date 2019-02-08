@@ -143,3 +143,21 @@ class ParallelLine {
         })
     }
 }
+
+class Renderer {
+    constructor() {
+        this.running = true
+        this.pl = new ParallelLine()
+    }
+
+    render(context, cb, endcb) {
+        while (this.running) {
+            this.pl.draw(context)
+            cb(context)
+            this.pl.update(() => {
+                this.running = false
+                endcb()
+            })
+        }
+    }
+}
